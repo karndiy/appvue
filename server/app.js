@@ -53,15 +53,55 @@ app.use(express.json()); // Middleware to parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 
-// config all agant 
-var mainUrl ="https://ggapi-uat.5k2an3or4q209.xyz/ggapi"
-var brandcode_main = 'THB1'
-var agent_main = 'thbapi'
-var currencycode_main = 'THB'
-var agentKey_main = 'DkZa23CzW5miIe44B9fMOA==' 
+var mainUrl  = ''
+var brandcode_main = ''
+var agent_main = ''
+var currencycode_main = ''
+var agentKey_main = '' 
 
+// Assuming 'db' is already initialized and available here
+// You need to ensure 'db' is correctly set up before calling load_configs
+
+async function load_configs(db) {
+    const rows = await db.get_oop('SELECT * FROM `config_data`');
+    const configData = rows.reduce((acc, row) => {
+        acc[row.config_key] = row.config_value;
+        return acc;
+    }, {});
+    console.log(configData);
+    //console.log('mm->' + configData['mainUrl']);
+    return configData;
+}
+
+async function initializeAppConfig() {
+    try {
+        // Load configuration from the database
+        const config = await load_configs(db)
+        
+        // Assign the fetched configurations to global variables
+        console.log(config)
+        mainUrl = config['mainUrl'];
+        brandcode_main = config['brandcode_main'];
+        agent_main = config['agent_main'];
+        currencycode_main = config['currencycode_main'];
+        agentKey_main = config['agentKey_main'];
+
+        // Now, the global variables are set, and you can proceed with your application logic
+        console.log("Configuration loaded successfully. Application can now proceed.");
+        startServer();
+        
+        // Example: startApplication(); // Call a function to start the rest of your app logic
+    } catch (error) {
+        console.error("Failed to load configuration:", error);
+    }
+}
+
+
+function startServer() {
+
+    console.log('main-url:-> ' + mainUrl)
 app.get('/', (req, res) => {
-    res.send('Hello from the backend!');
+    res.send('Hello from the backend!' + mainUrl);
   });
 
 
@@ -326,3 +366,5 @@ app.post('/withdrawal', (req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
+}
+initializeAppConfig();
