@@ -3,7 +3,10 @@ module.exports = defineConfig({
   transpileDependencies: true,
 
   devServer: {
-    proxy: 'http://localhost:3000',
+    proxy: 'http://localhost:8080',
+    //disableHostCheck: true,
+    allowedHosts: ['https://puma-genuine-distinctly.ngrok-free.app'],
+   
   },
 
   pluginOptions: {
